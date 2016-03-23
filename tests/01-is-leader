@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+
+import unittest
+import amulet
+
+
+class TestLeader(unittest.TestCase):
+    def test_leader(self):
+        dep = amulet.Deployment(series='trusty')
+        dep.add('test-leader')
+        dep.setup()
+        # clear out any existing units to start test fresh
+        dep.remove_unit(*[u.info['unit_name']
+                          for u in dep.sentry['test-leader']])
+        dep.sentry.wait()
+        for i in range(3):
+            dep.add_unit('test-leader', units=2)
+            dep.sentry.wait_for_messages({
+                'test-leader': ['Leader: True',
+                                'Leader: False'],
+            })
+            dep.remove_unit(*[u.info['unit_name']
+                              for u in dep.sentry['test-leader']])
+            dep.sentry.wait()
+        dep.remove_service('test-leader')
+        dep.sentry.wait()
+
+
+if __name__ == '__main__':
+    unittest.main()

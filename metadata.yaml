@@ -1,0 +1,7 @@
+name: test-leader
+summary: Test leadership
+description: Test leadership
+maintainer: me
+peers:
+  test-leader:
+    interface: test-leader
